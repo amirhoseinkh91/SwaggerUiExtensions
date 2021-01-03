@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +9,8 @@ namespace Swagger.Ui.Extensions.Middleware
     public abstract class AbstractSwaggerAuthenticationMiddleware
     {
         protected readonly RequestDelegate next;
-        protected readonly string swaggerUrlKey = "swagger";
-        protected readonly string headerName = "Authorization";
+        protected readonly string swaggerUrlKey;
+        protected readonly string headerName;
         protected readonly string username;
         protected readonly string password;
         protected abstract string AuthenticationType { get; }
@@ -28,7 +27,7 @@ namespace Swagger.Ui.Extensions.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             //Make sure we are hitting the swagger path, and not doing it locally as it just gets annoying :-)
-            if (context.Request.Path.StartsWithSegments($"/{swaggerUrlKey}"))
+            if (context.Request.Path.Value.Contains($"/{swaggerUrlKey}", StringComparison.OrdinalIgnoreCase))
             {
                 string authHeader = context.Request.Headers[headerName];
                 if (authHeader != null && authHeader.StartsWith($"{AuthenticationType} "))
